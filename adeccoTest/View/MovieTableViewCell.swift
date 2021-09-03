@@ -8,7 +8,7 @@
 import UIKit
 
 class MovieTableViewCell: UITableViewCell {
-
+    
     @IBOutlet weak var moviePoster: UIImageView!
     @IBOutlet weak var movieTitle: UILabel!
     @IBOutlet weak var movieYear: UILabel!
@@ -21,9 +21,8 @@ class MovieTableViewCell: UITableViewCell {
     func setCellWithValuesOf(_ movie: Movie) {
         updateUI(title: movie.title, releaseDate: movie.year, rating: movie.rate, overview: movie.overview, poster: movie.posterImage)
     }
-
-// Update the UI Views
     
+    // Update the UI Views
     private func updateUI(title: String?, releaseDate: String?, rating: Double?, overview: String?, poster: String?) {
         
         self.movieTitle.text = title

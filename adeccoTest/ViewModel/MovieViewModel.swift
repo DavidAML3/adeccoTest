@@ -43,7 +43,7 @@ class MovieViewModel {
         }.resume()
     }
     
-    func numberOfRowsInSection(section: Int) -> Int {
+    func numberOfItemsInSection(section: Int) -> Int {
         if popularMovies.count != 0 {
             return popularMovies.count
         }

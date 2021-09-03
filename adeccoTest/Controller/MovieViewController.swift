@@ -8,7 +8,7 @@
 import UIKit
 
 class MovieViewController: UIViewController {
-
+    
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var tableView: UITableView!
     
@@ -18,6 +18,9 @@ class MovieViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let layout = UICollectionViewFlowLayout()
+        collectionView.collectionViewLayout = layout
         
         collectionView.register(MovieCollectionViewCell.nib(), forCellWithReuseIdentifier: MovieCollectionViewCell.identifier)
         
@@ -68,8 +71,8 @@ class MovieViewController: UIViewController {
 //    }
 //}
 
-// MARK: - CollectionView
-extension MovieViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+// MARK: - CollectionView DataSource
+extension MovieViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.numberOfItemsInSection(section: section)
     }
@@ -83,6 +86,11 @@ extension MovieViewController: UICollectionViewDataSource, UICollectionViewDeleg
         return cell
     }
     
+    
+}
+
+// MARK: - CollectionView Delegate
+extension MovieViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(identifier: detailVC) as? DetailViewController {
             self.navigationController?.pushViewController(vc, animated: true)
@@ -101,6 +109,29 @@ extension MovieViewController: UICollectionViewDataSource, UICollectionViewDeleg
             
             vc.mOverview = movie.overview!
         }
+    }
+}
 
+// MARK: CollectonView FlowLayout
+
+extension MovieViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
+        flowLayout.minimumInteritemSpacing = 5
+        let width = floor((collectionView.frame.size.width/3)-(flowLayout.minimumInteritemSpacing*2))
+//        let height = 150
+        return CGSize(width: width, height: 180)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 5
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 5
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 1, left: 5, bottom: 1, right: -5)
     }
 }

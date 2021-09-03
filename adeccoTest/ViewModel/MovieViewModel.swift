@@ -37,6 +37,7 @@ class MovieViewModel {
                 print("Empty Data")
                 return
             }
+            
             if let image = UIImage(data: data) {
                 vc.mImage = image
             }

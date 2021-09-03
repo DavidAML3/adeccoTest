@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 class MovieViewModel {
     private var apiService = ApiService()
@@ -22,6 +23,24 @@ class MovieViewModel {
                 print("Error processing json data: \(error)")
             }
         }
+    }
+    
+    func getImageDataFrom(vc: DetailViewController, url: URL) {
+        URLSession.shared.dataTask(with: url) { (data, response, error) in
+            if let error = error {
+                print("Datatask error: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let data = data else {
+                // Handle Empty Data
+                print("Empty Data")
+                return
+            }
+            if let image = UIImage(data: data) {
+                vc.mImage = image
+            }
+        }.resume()
     }
     
     func numberOfRowsInSection(section: Int) -> Int {

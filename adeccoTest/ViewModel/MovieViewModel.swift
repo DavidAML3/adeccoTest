@@ -25,34 +25,25 @@ class MovieViewModel {
         }
     }
     
-    func getImageDataFromAsync(url: URL, completion: @escaping (UIImage?) -> Void) {
+    func getImageDataFrom(vc: DetailViewController, url: URL) {
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             if let error = error {
                 print("Datatask error: \(error.localizedDescription)")
-                completion(UIImage(named: "noImageAvailable"))
-                return
-            }
-            
-            if let response = response as? HTTPURLResponse, response.statusCode != 200 {
-                completion(UIImage(named: "noImageAvailable"))
                 return
             }
             
             guard let data = data else {
                 // Handle Empty Data
                 print("Empty Data")
-                completion(UIImage(named: "noImageAvailable"))
                 return
             }
-            
             if let image = UIImage(data: data) {
-                completion(image)
+                vc.mImage = image
             }
         }.resume()
     }
     
-    
-    func numberOfItemsInSection(section: Int) -> Int {
+    func numberOfRowsInSection(section: Int) -> Int {
         if popularMovies.count != 0 {
             return popularMovies.count
         }

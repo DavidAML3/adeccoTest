@@ -8,72 +8,43 @@
 import UIKit
 
 class MovieViewController: UIViewController {
-    
-    @IBOutlet weak var collectionView: UICollectionView!
+
+    @IBOutlet weak var tableView: UITableView!
     
     private var viewModel = MovieViewModel()
     private var urlString: String = ""
-    private var detailVC = "DetailViewController"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        collectionView.register(MovieCollectionViewCell.nib(), forCellWithReuseIdentifier: MovieCollectionViewCell.identifier)
-        
-        setupNavBar()
-        setupCollectionView()
         loadPopularMoviesData()
-    }
-    
-    fileprivate func setupNavBar() {
-        navigationItem.title = "Movies"
-        navigationController?.navigationBar.isTranslucent = false
-        navigationController?.navigationBar.backgroundColor = .black
-        navigationController?.navigationBar.tintColor = .systemTeal
-        
-        let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.width - 32, height: view.frame.height))
-        titleLabel.text = "Movies"
-        titleLabel.font = UIFont.systemFont(ofSize: 30)
-        titleLabel.textColor = .systemTeal
-        titleLabel.backgroundColor = .black
-        navigationItem.titleView = titleLabel
-    }
-    
-    private func setupCollectionView() {
-        collectionView.backgroundColor = .black
     }
     
     private func loadPopularMoviesData() {
         viewModel.fetchPopularMoviesData { [weak self] in
-            self?.collectionView.dataSource = self
-            self?.collectionView.delegate = self
-            self?.collectionView.reloadData()
+            self?.tableView.dataSource = self
+            self?.tableView.delegate = self
+            self?.tableView.reloadData()
         } 
     }
 }
 
-// MARK: - CollectionView DataSource
-extension MovieViewController: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.numberOfItemsInSection(section: section)
+// MARK: - TableView
+extension MovieViewController: UITableViewDataSource, UITableViewDelegate {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return viewModel.numberOfRowsInSection(section: section)
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCollectionViewCell.identifier, for: indexPath) as! MovieCollectionViewCell
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MovieTableViewCell
         
         let movie = viewModel.cellForRowAt(indexPath: indexPath)
         cell.setCellWithValuesOf(movie)
-        
         return cell
     }
     
-    
-}
-
-// MARK: - CollectionView Delegate
-extension MovieViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let vc = storyboard?.instantiateViewController(identifier: detailVC) as? DetailViewController {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let vc = storyboard?.instantiateViewController(identifier: "DetailViewController") as? DetailViewController {
             self.navigationController?.pushViewController(vc, animated: true)
             let movie = viewModel.cellForRowAt(indexPath: indexPath)
             vc.mTitle = movie.title!
@@ -86,39 +57,9 @@ extension MovieViewController: UICollectionViewDelegate {
                 return
             }
             
-            viewModel.getImageDataFromAsync(url: posterImageURL) { movieImage in
-                guard let movieImage = movieImage else {
-                    return
-                }
-                vc.mImage = movieImage
-            }
+            viewModel.getImageDataFrom(vc: vc, url: posterImageURL)
             
-            if let movieOverview = movie.overview, movieOverview == "" {
-                vc.mOverview = "No overview registed for \(movie.title ?? "This movie")"
-                return
-            }
             vc.mOverview = movie.overview!
         }
-    }
-}
-
-// MARK: CollectonView FlowLayout
-
-extension MovieViewController: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (view.frame.size.width/3)-3
-        return CGSize(width: width, height: 180)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 1
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 1
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
     }
 }

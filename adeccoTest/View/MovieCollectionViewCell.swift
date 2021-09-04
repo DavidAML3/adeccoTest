@@ -8,7 +8,7 @@
 import UIKit
 
 class MovieCollectionViewCell: UICollectionViewCell {
-
+    
     @IBOutlet weak var posterImage: UIImageView!
     static let identifier = "MovieCollectionViewCell"
     

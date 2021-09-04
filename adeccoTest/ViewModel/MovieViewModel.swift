@@ -25,25 +25,6 @@ class MovieViewModel {
         }
     }
     
-    func getImageDataFrom(vc: DetailViewController, url: URL) {
-        URLSession.shared.dataTask(with: url) { (data, response, error) in
-            if let error = error {
-                print("Datatask error: \(error.localizedDescription)")
-                return
-            }
-            
-            guard let data = data else {
-                // Handle Empty Data
-                print("Empty Data")
-                return
-            }
-            
-            if let image = UIImage(data: data) {
-                vc.mImage = image
-            }
-        }.resume()
-    }
-    
     func getImageDataFromAsync(url: URL, completion: @escaping (UIImage?) -> Void) {
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             if let error = error {

@@ -19,22 +19,10 @@ class DetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        fetchData()
-        setupAppearance()
-        setupCollectionView()
-    }
-    
-    private func fetchData() {
+        
         movieTitle.text = mTitle
         posterImage.image = mImage
         movieOverview.text = mOverview
     }
-    
-    private func setupAppearance() {
-        movieOverview.textColor = .white
-    }
-    
-    private func setupCollectionView() {
-        view.backgroundColor = .black
-    }
+
 }

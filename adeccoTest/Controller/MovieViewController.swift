@@ -25,6 +25,7 @@ class MovieViewController: UIViewController {
         loadPopularMoviesData()
     }
     
+    
     fileprivate func setupNavBar() {
         navigationItem.title = "Movies"
         navigationController?.navigationBar.isTranslucent = false
@@ -103,7 +104,6 @@ extension MovieViewController: UICollectionViewDelegate {
 }
 
 // MARK: CollectonView FlowLayout
-
 extension MovieViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = (view.frame.size.width/3)-3

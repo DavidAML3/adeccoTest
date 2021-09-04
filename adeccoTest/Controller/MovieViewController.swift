@@ -10,7 +10,6 @@ import UIKit
 class MovieViewController: UIViewController {
     
     @IBOutlet weak var collectionView: UICollectionView!
-    @IBOutlet weak var tableView: UITableView!
     
     private var viewModel = MovieViewModel()
     private var urlString: String = ""
@@ -19,12 +18,29 @@ class MovieViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let layout = UICollectionViewFlowLayout()
-        collectionView.collectionViewLayout = layout
-        
         collectionView.register(MovieCollectionViewCell.nib(), forCellWithReuseIdentifier: MovieCollectionViewCell.identifier)
         
+        setupNavBar()
+        setupCollectionView()
         loadPopularMoviesData()
+    }
+    
+    fileprivate func setupNavBar() {
+        navigationItem.title = "Movies"
+        navigationController?.navigationBar.isTranslucent = false
+        navigationController?.navigationBar.backgroundColor = .black
+        navigationController?.navigationBar.tintColor = .systemTeal
+        
+        let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.width - 32, height: view.frame.height))
+        titleLabel.text = "Movies"
+        titleLabel.font = UIFont.systemFont(ofSize: 30)
+        titleLabel.textColor = .systemTeal
+        titleLabel.backgroundColor = .black
+        navigationItem.titleView = titleLabel
+    }
+    
+    private func setupCollectionView() {
+        collectionView.backgroundColor = .black
     }
     
     private func loadPopularMoviesData() {
@@ -35,41 +51,6 @@ class MovieViewController: UIViewController {
         } 
     }
 }
-
-// MARK: - TableView
-//extension MovieViewController: UITableViewDataSource, UITableViewDelegate {
-//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        return viewModel.numberOfRowsInSection(section: section)
-//    }
-//
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MovieTableViewCell
-//
-//        let movie = viewModel.cellForRowAt(indexPath: indexPath)
-//        cell.setCellWithValuesOf(movie)
-//        return cell
-//    }
-//
-//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        if let vc = storyboard?.instantiateViewController(identifier: "DetailViewController") as? DetailViewController {
-//            self.navigationController?.pushViewController(vc, animated: true)
-//            let movie = viewModel.cellForRowAt(indexPath: indexPath)
-//            vc.mTitle = movie.title!
-//
-//            guard let posterString = movie.posterImage else { return }
-//            urlString = "https://image.tmdb.org/t/p/w300" + posterString
-//
-//            guard let posterImageURL = URL(string: urlString) else {
-//                vc.mImage = UIImage(named: "noImageAvailable")!
-//                return
-//            }
-//
-//            viewModel.getImageDataFrom(vc: vc, url: posterImageURL)
-//
-//            vc.mOverview = movie.overview!
-//        }
-//    }
-//}
 
 // MARK: - CollectionView DataSource
 extension MovieViewController: UICollectionViewDataSource {
@@ -105,9 +86,20 @@ extension MovieViewController: UICollectionViewDelegate {
                 return
             }
             
-            viewModel.getImageDataFrom(vc: vc, url: posterImageURL)
+            viewModel.getImageDataFromAsync(url: posterImageURL) { movieImage in
+                guard let movieImage = movieImage else {
+                    
+                    return
+                }
+                vc.mImage = movieImage
+            }
             
-            vc.mOverview = movie.overview!
+            if let movieOverview = movie.overview, movieOverview == "" {
+                vc.mOverview = "No overview registed for \(movie.title ?? "This movie")"
+                return
+            }
+//            vc.mOverview = movie.overview!
+            vc.mOverview = "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat."
         }
     }
 }
@@ -116,22 +108,19 @@ extension MovieViewController: UICollectionViewDelegate {
 
 extension MovieViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
-        flowLayout.minimumInteritemSpacing = 5
-        let width = floor((collectionView.frame.size.width/3)-(flowLayout.minimumInteritemSpacing*2))
-//        let height = 150
+        let width = (view.frame.size.width/3)-3
         return CGSize(width: width, height: 180)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 5
+        return 1
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 5
+        return 1
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 1, left: 5, bottom: 1, right: -5)
+        return UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
     }
 }

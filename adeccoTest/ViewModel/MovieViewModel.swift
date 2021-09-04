@@ -9,6 +9,8 @@ import Foundation
 import UIKit
 
 class MovieViewModel {
+    private var noImageAvailable = "noImageAvailable"
+    
     private var apiService = ApiService()
     private var popularMovies = [Movie]()
     
@@ -25,42 +27,23 @@ class MovieViewModel {
         }
     }
     
-    func getImageDataFrom(vc: DetailViewController, url: URL) {
-        URLSession.shared.dataTask(with: url) { (data, response, error) in
-            if let error = error {
-                print("Datatask error: \(error.localizedDescription)")
-                return
-            }
-            
-            guard let data = data else {
-                // Handle Empty Data
-                print("Empty Data")
-                return
-            }
-            
-            if let image = UIImage(data: data) {
-                vc.mImage = image
-            }
-        }.resume()
-    }
-    
     func getImageDataFromAsync(url: URL, completion: @escaping (UIImage?) -> Void) {
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             if let error = error {
                 print("Datatask error: \(error.localizedDescription)")
-                completion(UIImage(named: "noImageAvailable"))
+                completion(UIImage(named: self.noImageAvailable))
                 return
             }
             
             if let response = response as? HTTPURLResponse, response.statusCode != 200 {
-                completion(UIImage(named: "noImageAvailable"))
+                completion(UIImage(named: self.noImageAvailable))
                 return
             }
             
             guard let data = data else {
                 // Handle Empty Data
                 print("Empty Data")
-                completion(UIImage(named: "noImageAvailable"))
+                completion(UIImage(named: self.noImageAvailable))
                 return
             }
             

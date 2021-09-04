@@ -12,8 +12,8 @@ class MovieCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var posterImage: UIImageView!
     static let identifier = "MovieCollectionViewCell"
     
-    private var urlString: String = ""
     
+    private var urlString: String = ""
     private var movieTitle: String = ""
     private var movieOverview: String = ""
     
@@ -22,7 +22,7 @@ class MovieCollectionViewCell: UICollectionViewCell {
     }
     
     static func nib() -> UINib {
-        return UINib(nibName: "MovieCollectionViewCell", bundle: nil)
+        return UINib(nibName: identifier, bundle: nil)
     }
     
     func setCellWithValuesOf(_ movie: Movie) {

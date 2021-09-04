@@ -171,9 +171,9 @@
 		3899D3A026E024E500BFC073 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				3899D36B26DDD43700BFC073 /* Main.storyboard */,
 				38CFCCF826E28A230018FEF9 /* MovieCollectionViewCell.swift */,
 				38CFCCF926E28A230018FEF9 /* MovieCollectionViewCell.xib */,
+				3899D36B26DDD43700BFC073 /* Main.storyboard */,
 			);
 			path = View;
 			sourceTree = "<group>";

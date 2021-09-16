@@ -8,21 +8,22 @@
 import Foundation
 import UIKit
 
-class MovieViewModel {
+class MoviesFacade {
     private var noImageAvailable = "noImageAvailable"
     
     private var apiService = ApiService()
-    private var popularMovies = [Movie]()
+//    private var popularMovies = [Movie]()
     
-    func fetchPopularMoviesData(completion: @escaping () -> ()) {
+    func fetchPopularMoviesData(completion: @escaping ([Movie]) -> ()) {
         
-        apiService.getPopularMoviesData { [weak self] (result) in
+        apiService.getPopularMoviesData { (result) in
             switch result {
             case .success(let listOf):
-                self?.popularMovies = listOf.movies
-                completion()
+//                self?.popularMovies = listOf.movies
+                completion(listOf.movies)
             case .failure(let error):
                 print("Error processing json data: \(error)")
+                completion([])
             }
         }
     }
@@ -55,13 +56,13 @@ class MovieViewModel {
     
     
     func numberOfItemsInSection(section: Int) -> Int {
-        if popularMovies.count != 0 {
-            return popularMovies.count
-        }
+//        if popularMovies.count != 0 {
+//            return popularMovies.count
+//        }
         return 0
     }
     
-    func cellForRowAt (indexPath: IndexPath) -> Movie {
-        return popularMovies[indexPath.row]
-    }
+//    func cellForRowAt (indexPath: IndexPath) -> Movie {
+//        return popularMovies[indexPath.row]
+//    }
 }

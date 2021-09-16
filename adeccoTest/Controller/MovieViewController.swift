@@ -7,11 +7,18 @@
 
 import UIKit
 
+protocol MovieViewProtocol: AnyObject {
+    func updateMovies(_ movies: [Movie])
+}
+
 class MovieViewController: UIViewController {
+    
+    private var popularMovies = [Movie]()
+    lazy var presenter = MoviePresenter(view: self)
     
     @IBOutlet weak var collectionView: UICollectionView!
     
-    private var viewModel = MovieViewModel()
+    private var viewModel = MoviesFacade()
     private var urlString: String = ""
     private var detailVC = "DetailViewController"
     
@@ -19,10 +26,13 @@ class MovieViewController: UIViewController {
         super.viewDidLoad()
         
         collectionView.register(MovieCollectionViewCell.nib(), forCellWithReuseIdentifier: MovieCollectionViewCell.identifier)
+        self.collectionView.dataSource = self
+        self.collectionView.delegate = self
         
         setupNavBar()
         setupCollectionView()
-        loadPopularMoviesData()
+        presenter.getPopularMovies()
+//        loadPopularMoviesData()
     }
     
     fileprivate func setupNavBar() {
@@ -43,31 +53,31 @@ class MovieViewController: UIViewController {
         collectionView.backgroundColor = .black
     }
     
-    private func loadPopularMoviesData() {
-        viewModel.fetchPopularMoviesData { [weak self] in
-            self?.collectionView.dataSource = self
-            self?.collectionView.delegate = self
-            self?.collectionView.reloadData()
-        } 
-    }
+    //    private func loadPopularMoviesData() {
+    //        viewModel.fetchPopularMoviesData { [weak self] in
+    //            self?.collectionView.dataSource = self
+    //            self?.collectionView.delegate = self
+    //            self?.collectionView.reloadData()
+    //        }
+    //    }
 }
 
 // MARK: - CollectionView DataSource
 extension MovieViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.numberOfItemsInSection(section: section)
+        return popularMovies.count
+//        return viewModel.numberOfItemsInSection(section: section)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCollectionViewCell.identifier, for: indexPath) as! MovieCollectionViewCell
         
-        let movie = viewModel.cellForRowAt(indexPath: indexPath)
+//        let movie = viewModel.cellForRowAt(indexPath: indexPath)
+        let movie = popularMovies[indexPath.item]
         cell.setCellWithValuesOf(movie)
         
         return cell
     }
-    
-    
 }
 
 // MARK: - CollectionView Delegate
@@ -77,22 +87,22 @@ extension MovieViewController: UICollectionViewDelegate {
             self.navigationController?.pushViewController(vc, animated: true)
             let movie = viewModel.cellForRowAt(indexPath: indexPath)
             vc.mTitle = movie.title!
-            
+
             guard let posterString = movie.posterImage else { return }
             urlString = "https://image.tmdb.org/t/p/w300" + posterString
-            
+
             guard let posterImageURL = URL(string: urlString) else {
                 vc.mImage = UIImage(named: "noImageAvailable")!
                 return
             }
-            
+
             viewModel.getImageDataFromAsync(url: posterImageURL) { movieImage in
                 guard let movieImage = movieImage else {
                     return
                 }
                 vc.mImage = movieImage
             }
-            
+
             if let movieOverview = movie.overview, movieOverview == "" {
                 vc.mOverview = "No overview registed for \(movie.title ?? "This movie")"
                 return
@@ -120,5 +130,12 @@ extension MovieViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
+    }
+}
+
+extension MovieViewController: MovieViewProtocol {
+    func updateMovies(_ movies: [Movie]) {
+        popularMovies = movies
+        collectionView.reloadData()
     }
 }
